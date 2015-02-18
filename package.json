@@ -1,0 +1,46 @@
+{
+  "name": "backbone-collectionview",
+  "version": "0.0.1",
+  "description": "A Backbone.js View that opperates on a collection, including child lifecycle management. Built on top of backbone-kinview",
+  "main": "src/view.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mbrevda/backbone-collectionview.git"
+  },
+  "keywords": [
+    "backbone",
+    "collection",
+    "view",
+    "backbone",
+    "view",
+    "backbone",
+    "collection",
+    "child",
+    "children"
+  ],
+  "author": "Moshe Brevda mbrevda@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mbrevda/backbone-collectionview/issues"
+  },
+  "homepage": "https://github.com/mbrevda/backbone-collectionview",
+  "dependencies": {
+    "backbone-kinview": "0.0.21"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-coverage": "^0.3.34",
+    "gulp-if": "^1.2.5",
+    "gulp-jshint": "^1.9.2",
+    "gulp-mocha": "^2.0.0",
+    "gulp-util": "^3.0.3",
+    "jsdom": "^3.1.1",
+    "minimist": "^1.1.0",
+    "mocha": "^2.1.0",
+    "should": "^5.0.0",
+    "vinyl-source-stream": "^1.0.0"
+  }
+}
