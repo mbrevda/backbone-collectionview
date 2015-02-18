@@ -1,40 +1,40 @@
 var Backbone = require('backbone'),
-    KinView = require('backbone-kinview')
+    _ = require('underscore'),
+    KinView = require('backbone-kinview'),
+    ChildView = require('./childView.js')
 
 module.exports = KinView.extend({
-    constructor: function(opts) {
+    constructor: function() {
         // super()
-        //this.constructor.__super__.constructor.apply(this, arguments)
         KinView.apply(this, arguments)
 
+        // defaults
+        this.collection = null
         this.filters = {}
+        this.childView = this.childView || ChildView
+        var opts = arguments[0]
+
         this.on('filter', this.rerenderChildren, this)
 
         if (opts && opts.collection) {
             this.setCollection(opts.collection)
-
         }
     },
-    
     // datasource handling
     setCollection: function(collection) {
-        if (!(collection instanceof Backbone.Collection)) {
-            throw new Error('Invalid collection passed!')
-        }
-        
         // stop listening to the current collection, if there is one
         if (this.collection) {
             this.stopListening(this.collection)
         }
         
         // clear all child elements
-        this.removeAll()
+        this.children.removeAll()
 
         this.collection = collection
 
-        _.each(this.collection, this.addChild, this)
+        this.collection.each(this.addChild, this)
         this.listenTo(this.collection, 'add', _.bind(this.addChild, this))
-        //this.listenTo(this.collection, 'sort', this.appendChild, this)
+        this.listenTo(this.collection, 'sort', this.addChild, this)
     },
     addChild: function(model) {
         return this.add({
@@ -42,12 +42,9 @@ module.exports = KinView.extend({
         })
     },
     rerenderChildren: function() {
-        this.removeAll()
-        if (!(this.children instanceof Backbone.Collection)) {
-            return false
-        }
+        this.children.removeAll()
 
-        this.children.each(_.bind(this.addChild, this))
+        this.collection.each(this.addChild, this)
     },
 
     // filtering functions
@@ -65,11 +62,9 @@ module.exports = KinView.extend({
     filter: function(model) {
         return _.every(this.filters, function(filter) {
             return filter(model)
-        })
+        }, this)
     },
     filtered: function() {
-        return this.collection.every(this.filters, function(filter) {
-            return filter(model)
-        }, this)
+        return this.collection.filter(this.filter, this)
     }
 })
