@@ -1,6 +1,7 @@
 var should = require('should'),
 	Backbone = require('backbone'),
-	View = require('../')
+	View = require('../'),
+	ChildView = require('../').childView
 
 describe('View', function(){
     beforeEach(function() {
@@ -98,5 +99,43 @@ describe('View', function(){
 
 		collection1.trigger('test')
 		collection2.trigger('test')
+	})
+
+	it('Adding a filter should rerender the children, filtered', function() {
+		this.view.childView = ChildView.extend({
+			render: function() {
+				this.$el.text(this.model.get('foo'))
+			}
+		})
+		this.view.setCollection(this.collection)
+		this.view.$el.html().should
+			.equal('<div>bar0</div><div>bar1</div><div>bar2</div>')
+
+		this.view.addFilter('foo', function(model) {
+			return model.get('foo') !== 'bar2'
+		})
+
+		this.view.$el.html().should.equal('<div>bar0</div><div>bar1</div>')
+	})
+
+	it('Removing a filter should rerender the children, filtered', function() {
+		var string = '<div>bar0</div><div>bar1</div><div>bar2</div>'
+		this.view.childView = ChildView.extend({
+			render: function() {
+				this.$el.text(this.model.get('foo'))
+			}
+		})
+
+		this.view.setCollection(this.collection)
+		this.view.$el.html().should.equal(string)
+
+		this.view.addFilter('foo', function(model) {
+			return model.get('foo') !== 'bar2'
+		})
+
+		this.view.$el.html().should.equal('<div>bar0</div><div>bar1</div>')
+
+		this.view.removeFilter('foo')
+		this.view.$el.html().should.equal(string)
 	})
 })

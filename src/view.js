@@ -26,7 +26,7 @@ module.exports = KinView.extend({
         if (this.collection) {
             this.stopListening(this.collection)
         }
-        
+
         // clear all child elements
         this.children.removeAll()
 
@@ -37,6 +37,9 @@ module.exports = KinView.extend({
         this.listenTo(this.collection, 'sort', this.addChild, this)
     },
     addChild: function(model) {
+        if (!this.filter(model)) {
+            return false
+        }
         return this.add({
             view: new this.childView({model: model})
         })
