@@ -84,6 +84,23 @@ describe('View', function(){
 		view.collection.should.be.an.instanceOf(Backbone.Collection)
 	})
 
+	it.only('collections will be rendered when there are no filters', function() {
+		var childView = ChildView.extend({
+			render: function() {
+				this.$el.text(this.model.get('foo'))
+			}
+		})
+
+		var view = new View({
+			collection: this.collection,
+			childView: childView
+		})
+
+		view.$el.children().eq(0).text().should.equal('bar0')
+		view.$el.children().eq(1).text().should.equal('bar1')
+		view.$el.children().eq(2).text().should.equal('bar2')
+	})
+
 	it('Stop listening to collection before its replaced', function(done) {
 		var collection1 = new Backbone.Collection(),
 			collection2 = new Backbone.Collection(),

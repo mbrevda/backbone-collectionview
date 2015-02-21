@@ -11,13 +11,15 @@ module.exports = KinView.extend({
         // defaults
         this.collection = null
         this.filters = {}
-        this.childView = this.childView || ChildView
-        var opts = arguments[0]
 
         this.on('filter', this.rerenderChildren, this)
 
-        if (opts && opts.collection) {
-            this.setCollection(opts.collection)
+        // process arguments, if received
+        var options = arguments[0] || {}
+
+        this.childView = options.childView || ChildView
+        if (options.collection) {
+            this.setCollection(options.collection)
         }
     },
     // datasource handling
@@ -63,6 +65,8 @@ module.exports = KinView.extend({
         this.filters = {}
     },
     filter: function(model) {
+        // retuns true if there are no filter
+        // https://github.com/jashkenas/underscore/blob/master/underscore.js#L239
         return _.every(this.filters, function(filter) {
             return filter(model)
         }, this)
