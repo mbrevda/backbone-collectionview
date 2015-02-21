@@ -4,6 +4,7 @@ var Backbone = require('backbone'),
     ChildView = require('./childView.js')
 
 module.exports = KinView.extend({
+    childView: ChildView,
     constructor: function() {
         // super()
         KinView.apply(this, arguments)
@@ -17,7 +18,6 @@ module.exports = KinView.extend({
         // process arguments, if received
         var options = arguments[0] || {}
 
-        this.childView = options.childView || ChildView
         if (options.collection) {
             this.setCollection(options.collection)
         }
@@ -42,6 +42,7 @@ module.exports = KinView.extend({
         if (!this.filter(model)) {
             return false
         }
+        
         return this.add({
             view: new this.childView({model: model})
         })

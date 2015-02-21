@@ -84,17 +84,15 @@ describe('View', function(){
 		view.collection.should.be.an.instanceOf(Backbone.Collection)
 	})
 
-	it.only('collections will be rendered when there are no filters', function() {
+	it('collections will be rendered when there are no filters', function() {
 		var childView = ChildView.extend({
 			render: function() {
 				this.$el.text(this.model.get('foo'))
 			}
 		})
 
-		var view = new View({
-			collection: this.collection,
-			childView: childView
-		})
+		var MyView = View.extend({childView: childView})
+		var view = new MyView({collection: this.collection,})
 
 		view.$el.children().eq(0).text().should.equal('bar0')
 		view.$el.children().eq(1).text().should.equal('bar1')
