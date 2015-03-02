@@ -13,62 +13,6 @@ describe('View', function(){
             ])
     })
 
-    it('addFilter()', function(){
-        this.view.setCollection(this.collection)
-        this.view.addFilter('foo', function(){})
-        this.view.filters['foo'].should.be.type('function')
-    })
-
-    it('removeFilter()', function(){
-        this.view.setCollection(this.collection)
-        this.view.addFilter('foo', function(){})
-        this.view.removeFilter('foo')
-
-        ;(this.view.filters['foo'] === undefined).should.be.ok
-    })
-
-    it('filter() true', function(){
-        this.view.setCollection(this.collection)
-        this.view.addFilter('true', function(value){
-            return value == 'foo'
-        })
-
-        this.view.filter('foo').should.be.true
-    })
-
-    it('clearFilters()', function(){
-        this.view.setCollection(this.collection)
-        this.view.addFilter('foo', function(){})
-        this.view.clearFilters()
-        this.view.filters.should.be.empty
-    })
-
-    it('filter() return false', function(){
-        this.view.setCollection(this.collection)
-        this.view.addFilter('true', function(value){
-            return false
-        })
-
-        this.view.filter('foo').should.be.false
-    })
-
-	it('filtered() should return an array of models', function(){
-		this.view.setCollection(this.collection)
-		this.view.addFilter('true', function(model){
-			return model.get('foo') !== 'bar2'
-		})
-
-		this.view.filtered().should.be.instanceof(Array).and.have.lengthOf(2)
-	})
-
-    it('filter names may contain spaces', function(){
-        this.view.setCollection(this.collection)
-        this.view.addFilter('some name', function(){})
-        this.view.removeFilter('some name')
-
-        Object.keys(this.view.filters).length.should.eql(0)
-    })
-
 	it('collections can be passed as an opt', function() {
 		var view = new View({
 			collection: new Backbone.Collection()
@@ -92,7 +36,7 @@ describe('View', function(){
 		})
 
 		var MyView = View.extend({childView: childView})
-		var view = new MyView({collection: this.collection,})
+		var view = new MyView({collection: this.collection})
 
 		view.$el.children().eq(0).text().should.equal('bar0')
 		view.$el.children().eq(1).text().should.equal('bar1')
@@ -101,8 +45,8 @@ describe('View', function(){
 
 	it('Stop listening to collection before its replaced', function(done) {
 		var collection1 = new Backbone.Collection(),
-			collection2 = new Backbone.Collection(),
-			view = new View({collection: collection1})
+		collection2 = new Backbone.Collection(),
+		view = new View({collection: collection1})
 
 		collection2.on('test', done)
 
@@ -116,41 +60,20 @@ describe('View', function(){
 		collection2.trigger('test')
 	})
 
-	it('Adding a filter should rerender the children, filtered', function() {
-		this.view.childView = ChildView.extend({
-			render: function() {
-				this.$el.text(this.model.get('foo'))
-			}
-		})
+	it('Child shouldnt render if it wont pass the filter', function(){
 		this.view.setCollection(this.collection)
-		this.view.$el.html().should
-			.equal('<div>bar0</div><div>bar1</div><div>bar2</div>')
-
-		this.view.addFilter('foo', function(model) {
-			return model.get('foo') !== 'bar2'
+		this.view.addFilter('foo', function(model){
+			return model.get('foo') !== 'bar3'
 		})
 
-		this.view.$el.html().should.equal('<div>bar0</div><div>bar1</div>')
+		var f = this.collection.add({foo: 'bar3'})
+		this.view.$el.children().length.should.equal(3)
 	})
 
-	it('Removing a filter should rerender the children, filtered', function() {
-		var string = '<div>bar0</div><div>bar1</div><div>bar2</div>'
-		this.view.childView = ChildView.extend({
-			render: function() {
-				this.$el.text(this.model.get('foo'))
-			}
-		})
-
+	it('Should render child on add', function(){
 		this.view.setCollection(this.collection)
-		this.view.$el.html().should.equal(string)
+		this.collection.add({foo: 999})
 
-		this.view.addFilter('foo', function(model) {
-			return model.get('foo') !== 'bar2'
-		})
-
-		this.view.$el.html().should.equal('<div>bar0</div><div>bar1</div>')
-
-		this.view.removeFilter('foo')
-		this.view.$el.html().should.equal(string)
+		this.view.$el.children().length.should.equal(4)
 	})
 })

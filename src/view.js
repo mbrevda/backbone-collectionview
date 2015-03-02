@@ -12,8 +12,12 @@ module.exports = KinView.extend({
         // defaults
         this.collection = null
         this.filters = {}
-
-        this.on('filter', this.rerenderChildren, this)
+        this.sort = null
+        this.page = {
+            offset: null,
+            limit: 25
+        }
+        this.on('rerender', this.renderChildren, this)
 
         // process arguments, if received
         var options = arguments[0] || {}
@@ -29,44 +33,68 @@ module.exports = KinView.extend({
             this.stopListening(this.collection)
         }
 
-        // clear all child elements
-        this.children.removeAll()
-
         this.collection = collection
 
-        this.collection.each(this.addChild, this)
+        this.renderChildren()
+
         this.listenTo(this.collection, 'add', _.bind(this.addChild, this))
-        this.listenTo(this.collection, 'sort', this.addChild, this)
+        this.listenTo(this.collection, 'reset', this.renderChildren, this)
     },
     addChild: function(model) {
-        if (!this.filter(model)) {
-            return false
-        }
-        
+        // dont bother if this model wont pass the filters anyway
+        if (!this.filter(model)) return false
+
+        // we need to do a full re-render if there is a sorter or pagination
+        if (this.sort || this.page.offset) return this.trigger('rerender')
+
+        return this.append(model)
+    },
+    append: function(model) {
+        // calling append directly will bypass all sorting/filtering/paging
+        // call addChild instead
         return this.add({
             view: new this.childView({model: model})
         })
     },
-    rerenderChildren: function() {
+    renderChildren: function() {
         this.children.removeAll()
 
-        this.collection.each(this.addChild, this)
+        // process collection
+        var models =
+            _.isEmpty(this.filters)
+            ? this.collection.models.slice()
+            : this.collection.filter(this.filter, this)
+
+        // sort
+        if (this.sort) models.sort(this.sort)
+
+        var chain = _(models).chain()
+
+        // page
+        chain = _.isNull(this.page.offset)
+            ? chain
+            : chain.rest(this.page.offset).first(this.page.limit)
+
+        // append whatever is left to the view
+        chain.each(this.append, this)
+
     },
 
     // filtering functions
     addFilter: function(name, filter) {
         this.filters[name] = filter
-        this.trigger('filter')
+        this.trigger('rerender')
     },
     removeFilter: function(name) {
         delete this.filters[name]
-        this.trigger('filter')
+        this.trigger('rerender')
     },
     clearFilters: function() {
         this.filters = {}
+        this.trigger('rerender')
     },
     filter: function(model) {
-        // retuns true if there are no filter
+        // returns true if there are no filter
         // https://github.com/jashkenas/underscore/blob/master/underscore.js#L239
         return _.every(this.filters, function(filter) {
             return filter(model)
@@ -74,5 +102,27 @@ module.exports = KinView.extend({
     },
     filtered: function() {
         return this.collection.filter(this.filter, this)
+    },
+
+    // paging function
+    setPage: function(offset, limit) {
+        // dont do anything if there is nothing to do
+        if (_.isNull(this.page.offset) && _.isNull(offset)) return true
+
+        // set the offset (i.e. the page)
+        this.page.offset = _.isNumber(offset) || _.isNull(offset) ? offset : null
+
+        // set the limit (i.e. items per page)
+        if (arguments.length > 1) {
+            this.page.limit = _.isNumber(limit) ? limit : 25
+        }
+
+        this.trigger('rerender')
+    },
+
+    // sorting functions
+    setSort: function(val) {
+        this.sort = val
+        this.trigger('rerender')
     }
 })

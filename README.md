@@ -18,6 +18,7 @@ npm install backbone-collectionview --save
 
 ## CI
 CollectionView continuous integrations is handled by Wercker:
+
 [![wercker status](https://app.wercker.com/status/194111aeb3f08fedd7af263f0fc793d3/s "wercker status")](https://app.wercker.com/project/bykey/194111aeb3f08fedd7af263f0fc793d3)
 
 ## Testing
@@ -40,13 +41,13 @@ Getting started with CollectionView is as simple as creating a new Backbone view
 ```js
 var CollectionView = require('backbone-collectionview')
 
-var table = CollectionView.extend({
+var view = CollectionView.extend({
     // regular Backbone.View opts here
 })
 
 ```
 
-Passing a collection to the view will allow the view to auto-append all items of the collection to the table and manage their lifecycle including adding items as they get added to the collection, appending the items to the table, and cleaning up when the child view is removed. To pass a collection to the table:
+Passing a collection to the view will allow the view to auto-append all items of the collection to the table and manage their lifecycle including adding child items as they get added to the collection, and cleaning up when the child view is removed. To pass a collection to a view:
 
 ```js
 var CollectionView = require('backbone-collectionview')
@@ -76,5 +77,27 @@ A filter can be removed by calling `removeFilter('name')`.
 
 Whenever a filter is added or removed, the table will be re-filtered. If rows have been added that aren't part of the collection, they will inadvertently be removed.
 
-### Sorting rows
-####sorting is not yet implemented
+### Sorting children
+The order of children view can be sorted by passing a sort function:
+
+```js
+view.setSort(/* some func here */)
+```
+
+Sorting is delegated to the native [array sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
+
+### Pagination
+Views can be limited to a given subset of the collection, commonly called pagination.
+This can help contain the total about of dom elements the children views add.
+To add pagination, use:
+
+```js
+view.setPage(offset, limit)
+```
+
+where `offset` (zero based, children are in an array!) is the first child to display,
+and `limit` is the maximum amount of items to show.
+
+### Performance impact
+Unlike with no options or just with filtering, When using sorting or pagination, every child added
+to the collection will cause a full redraw of the CollectionView. This should be kept in mind when adding children one at a time.
