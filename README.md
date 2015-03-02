@@ -47,12 +47,12 @@ var view = CollectionView.extend({
 
 ```
 
-Passing a collection to the view will allow the view to auto-append all items of the collection to the table and manage their lifecycle including adding child items as they get added to the collection, and cleaning up when the child view is removed. To pass a collection to a view:
+Passing a collection to the view will allow the view to auto-append all items of the collection to the view and manage their lifecycle including adding child items as they get added to the collection, and cleaning up when the child view is removed. To pass a collection to a view:
 
 ```js
 var CollectionView = require('backbone-collectionview')
 
-var table = CollectionView.extend({
+var view = CollectionView.extend({
     collection: new Backbone.Collection([/* models */])
     // regular Backbone.View opts here
 })
@@ -75,7 +75,7 @@ A view can have multiple filters. To add more filters, just call `addFilter()` a
 
 A filter can be removed by calling `removeFilter('name')`.
 
-Whenever a filter is added or removed, the table will be re-filtered. If rows have been added that aren't part of the collection, they will inadvertently be removed.
+Whenever a filter is added or removed, the view will be re-filtered. If rows have been added that aren't part of the collection, they will inadvertently be removed.
 
 ### Sorting children
 The order of children view can be sorted by passing a sort function:
