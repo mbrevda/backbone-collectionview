@@ -22,9 +22,8 @@ module.exports = KinView.extend({
         // process arguments, if received
         var options = arguments[0] || {}
 
-        if (options.collection) {
-            this.setCollection(options.collection)
-        }
+        this.setCollection(options.collection || new Backbone.Collection())
+        
     },
     // datasource handling
     setCollection: function(collection) {
