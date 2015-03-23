@@ -49,7 +49,7 @@ describe('Page', function(){
         _.isNull(this.view.page.offset).should.be.ok
     })
 
-    it('Page should default to a limit of 25 if invalud arg is passed', function(){
+    it('Page should default to a limit of 25 if invalid arg is passed', function(){
         this.view.setPage(0, 'hello')
 
         this.view.page.limit.should.equal(25)

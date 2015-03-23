@@ -23,7 +23,7 @@ module.exports = KinView.extend({
         var options = arguments[0] || {}
 
         this.setCollection(options.collection || new Backbone.Collection())
-        
+
     },
     // datasource handling
     setCollection: function(collection) {
@@ -59,24 +59,45 @@ module.exports = KinView.extend({
         this.children.removeAll()
 
         // process collection
+
+        var hasFilters = !_.isEmpty(this.filters)
+        var hasPage    = !_.isNull(this.page.offset)
         var models =
-            _.isEmpty(this.filters)
+            this.sort
             ? this.collection.models.slice()
-            : this.collection.filter(this.filter, this)
+            : this.collection.models
 
         // sort
         if (this.sort) models.sort(this.sort)
 
-        var chain = _(models).chain()
+        // page and append
+        var start = 0, end = models.length
+        if (hasPage) {
+            start = this.page.offset || 0
+            end   = (this.page.limit || 25) + start
+            // dont overshoot the amount of elements
+            end = end > models.length ? models.length : end
+        }
 
-        // page
-        chain = _.isNull(this.page.offset)
-            ? chain
-            : chain.rest(this.page.offset).first(this.page.limit)
+        for (var i = start; i < end; i++) {
+            if (!hasFilters) {
+                this.append(models[i])
+                continue
+            }
 
-        // append whatever is left to the view
-        chain.each(this.append, this)
+            // if this model passes the filter, append it
+            if (this.filter(models[i])) {
+                this.append(models[i])
+            } else {
+                // otherwise, increment the end value, but to dont allow it to
+                // overshoot the array
+                if (hasPage) {
+                    end++
+                    end = end > models.length ? models.length : end
+                }
+            }
 
+        }
     },
 
     // filtering functions
