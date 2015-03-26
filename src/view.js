@@ -6,9 +6,6 @@ var Backbone = require('backbone'),
 module.exports = KinView.extend({
     childView: ChildView,
     constructor: function() {
-        // super()
-        KinView.apply(this, arguments)
-
         // defaults
         this.collection = null
         this.filters = {}
@@ -17,6 +14,10 @@ module.exports = KinView.extend({
             offset: null,
             limit: 25
         }
+        
+        // super()
+        KinView.apply(this, arguments)
+        
         this.on('rerender', this.renderChildren, this)
 
         // process arguments, if received
