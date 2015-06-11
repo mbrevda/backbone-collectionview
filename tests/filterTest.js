@@ -123,4 +123,5 @@ describe('Filters', function(){
 
         this.view.$el.html().should.equal('<div>bar0</div><div>bar1</div>')
     })
+
 })

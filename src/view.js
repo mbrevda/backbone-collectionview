@@ -14,10 +14,10 @@ module.exports = KinView.extend({
             offset: null,
             limit: 25
         }
-        
+
         // super()
         KinView.apply(this, arguments)
-        
+
         this.on('rerender', this.renderChildren, this)
 
         // process arguments, if received
@@ -58,9 +58,12 @@ module.exports = KinView.extend({
     },
     renderChildren: function() {
         this.children.removeAll()
+        this.getCurrentChildren(_.bind(this.append, this))
+    },
+    getCurrentChildren: function(done) {
+        var children = []
 
         // process collection
-
         var hasFilters = !_.isEmpty(this.filters)
         var hasPage    = !_.isNull(this.page.offset)
         var models =
@@ -86,9 +89,10 @@ module.exports = KinView.extend({
                 continue
             }
 
-            // if this model passes the filter, append it
+            // if this model passes the filter, call the callback
             if (this.filter(models[i])) {
-                this.append(models[i])
+                if (typeof done == 'function') done(models[i])
+                else children.push(models[i])
             } else {
                 // otherwise, increment the end value, but to dont allow it to
                 // overshoot the array
@@ -97,10 +101,10 @@ module.exports = KinView.extend({
                     end = end > models.length ? models.length : end
                 }
             }
-
         }
-    },
 
+        if (typeof done !== 'function') return children
+    },
     // filtering functions
     addFilter: function(name, filter) {
         this.filters[name] = filter

@@ -76,4 +76,13 @@ describe('View', function(){
 
 		this.view.$el.children().length.should.equal(4)
 	})
+
+    it('getCurrentCollection() should return a current array of models', function(){
+        this.view.setCollection(this.collection)
+        this.view.addFilter('true', function(model){
+            return model.get('foo') !== 'bar2'
+        })
+
+        this.view.getCurrentChildren().should.be.instanceof(Array).and.have.lengthOf(2)
+    })
 })
