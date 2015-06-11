@@ -1,6 +1,6 @@
 {
   "name": "backbone-collectionview",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "A Backbone.js View that opperates on a collection, including child lifecycle management. Built on top of backbone-kinview",
   "main": "index.js",
   "scripts": {
