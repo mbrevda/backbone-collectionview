@@ -72,7 +72,7 @@ module.exports = KinView.extend({
             : this.collection.models
 
         // sort
-        if (this.sort) models.sort(this.sort)
+        if (this.sort && hasPage) models.sort(this.sort)
 
         // page and append
         var start = 0, end = models.length
@@ -95,7 +95,12 @@ module.exports = KinView.extend({
             // let the end value to be longer than the length of the array
             if (hasPage) end = Math.min(end + 1, models.length)
         }
-
+        
+        // when filtering, we prefer to sort the filtered collection after filtering
+        // as its probably smaller. When paging, however, this is improper as 
+        // pagination is generally desired after sorting and filtering
+        if (!hasPage && this.sort ) children.sort(this.sort)
+            
         if (typeof done == 'function') return children.forEach(done, context)
         return children
     },
