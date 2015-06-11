@@ -93,7 +93,7 @@ module.exports = KinView.extend({
             // if were going to reject this model, increment the end value so
             // that we can test one more model from the collection, but dont
             // let the end value to be longer than the length of the array
-            if (hasPage) end = Math.min(end++, models.length)
+            if (hasPage) end = Math.min(end + 1, models.length)
         }
 
         if (typeof done == 'function') return children.forEach(done, context)
