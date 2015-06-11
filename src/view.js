@@ -50,17 +50,17 @@ module.exports = KinView.extend({
         return this.append(model)
     },
     append: function(model) {
-        // calling append directly will bypass all sorting/filtering/paging
-        // call addChild instead
+        // calling append() directly will bypass all sorting/filtering/paging
+        // instead, call addChild()
         return this.add({
             view: new this.childView({model: model})
         })
     },
     renderChildren: function() {
         this.children.removeAll()
-        this.getCurrentChildren(_.bind(this.append, this))
+        this.getCurrentChildren(this.append, this)
     },
-    getCurrentChildren: function(done) {
+    getCurrentChildren: function(done, context) {
         var children = []
 
         // process collection
@@ -80,30 +80,24 @@ module.exports = KinView.extend({
             start = this.page.offset || 0
             end   = (this.page.limit || 25) + start
             // dont overshoot the amount of elements
-            end = end > models.length ? models.length : end
+            end = Math.min(end, models.length)
         }
 
         for (var i = start; i < end; i++) {
-            if (!hasFilters) {
-                this.append(models[i])
-                continue
-            }
+            // if there are no filters, just add the model
+            if (!hasFilters) {children.push(models[i]); continue}
 
-            // if this model passes the filter, call the callback
-            if (this.filter(models[i])) {
-                if (typeof done == 'function') done(models[i])
-                else children.push(models[i])
-            } else {
-                // otherwise, increment the end value, but to dont allow it to
-                // overshoot the array
-                if (hasPage) {
-                    end++
-                    end = end > models.length ? models.length : end
-                }
-            }
+            // otherwise, if this model passes the filter, add it to the results
+            if (this.filter(models[i])) {children.push(models[i]); continue}
+
+            // if were going to reject this model, increment the end value so
+            // that we can test one more model from the collection, but dont
+            // let the end value to be longer than the length of the array
+            if (hasPage) end = Math.min(end++, models.length)
         }
 
-        if (typeof done !== 'function') return children
+        if (typeof done == 'function') return children.forEach(done, context)
+        return children
     },
     // filtering functions
     addFilter: function(name, filter) {

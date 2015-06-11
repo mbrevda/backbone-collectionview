@@ -88,7 +88,7 @@ describe('Filters', function(){
                 this.$el.text(this.model.get('foo'))
             }
         })
-        this.view.setCollection(this.collection)
+
         this.view.$el.html().should
             .equal('<div>bar0</div><div>bar1</div><div>bar2</div>')
 
