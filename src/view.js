@@ -70,6 +70,9 @@ module.exports = KinView.extend({
             this.sort
             ? this.collection.models.slice()
             : this.collection.models
+        
+        // no point in continuing if we dont have models
+        if (!models || models.length === 0) return false
 
         // sort
         if (this.sort && hasPage) models.sort(this.sort)
