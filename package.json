@@ -30,10 +30,10 @@
   "dependencies": {
     "backbone": "^1",
     "backbone-kinview": "^0",
-    "jquery": "^2",
     "underscore": "^1"
   },
   "devDependencies": {
+    "jquery": "^2",
     "browserify": "^11",
     "gulp": "^3",
     "gulp-coverage": "^0.3.34",
@@ -41,7 +41,7 @@
     "gulp-jshint": "^1.9.2",
     "gulp-mocha": "^2.0.0",
     "gulp-util": "^3.0.3",
-    "jsdom": "^3",
+    "jsdom": "^6",
     "minimist": "^1.1.0",
     "mocha": "^2",
     "should": "^7",
